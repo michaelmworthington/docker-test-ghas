@@ -3,8 +3,8 @@ name: ci-feature
 on:
   push:
     branches:
-      - 'feature/*'
-      - 'dependabot/*'
+      - 'feature/**'
+      - 'dependabot/**'
 jobs:
   docker:
     runs-on: ubuntu-latest
