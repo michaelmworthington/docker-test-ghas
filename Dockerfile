@@ -4,7 +4,13 @@
 # PDI is supported on JDK 8
 # This will run the most recent JDK on top of a slimed version of Debian 11 (Bullseye)
 # TODO: best practice to pin the sha of the tag - how do we keep up to date???
-FROM openjdk:8u332-jre-slim-bullseye
+#FROM openjdk:8u332-jre-slim-bullseye
+#docker pull 
+FROM openjdk:8u332-jre-slim-bullseye@sha256:704f379deb0f0894681470ec491c5254e7c4894ddc01e6d8823cfe8a2723b458
+#docker hub - amd
+#FROM openjdk:8u332-jre-slim-bullseye@sha256:7aa0997564df6b46ac70db0d75b0f4bf3c62dd1bc0ed8fc0953ec6c569b4a657
+#docker hub - arm
+#FROM openjdk:8u332-jre-slim-bullseye@sha256:64a800eeac81c35c8377df53a9470bec75c069e19a7a374904266206da495df8
 
 ARG GITHUB_REPOSITORY
 ARG GITHUB_REF_NAME
