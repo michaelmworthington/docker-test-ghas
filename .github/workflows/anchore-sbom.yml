@@ -1,0 +1,52 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# This workflow checks out code, builds an image, performs a container image
+# vulnerability scan with Anchore's Grype tool, and integrates the results with GitHub Advanced Security
+# code scanning feature.  For more information on the Anchore scan action usage
+# and parameters, see https://github.com/anchore/scan-action. For more
+# information on Anchore's container image scanning tool Grype, see
+# https://github.com/anchore/grype
+name: Anchore SBOM Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+  # No need to run periodically. The SBOM will be reevaluated by GitHub automatically
+  # schedule:
+  #   - cron: '18 5 * * 1'
+
+permissions: write-all
+
+jobs:
+  Anchore-SBOM-Scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v3
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build with Buildkit
+      uses: docker/build-push-action@v2
+      with:
+        tags: this/dockerfile
+        load: true
+        push: false
+
+    - name: Run the Anchore sbom action
+      uses: anchore/sbom-action@v0.11.0
+      id: anchore-sbom
+      with:
+        image: "this/dockerfile"
+        dependency-snapshot: true
+        format: github

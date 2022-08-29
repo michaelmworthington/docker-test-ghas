@@ -1,0 +1,55 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# A sample workflow which checks out the code, builds a container
+# image using Docker and scans that image for OSS Components using
+# Trivy. The SBOM results are then uploaded to GitHub Dependency Graph
+
+name: Trivy SBOM Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+  # No need to run periodically. The SBOM will be reevaluated by GitHub automatically
+  # schedule:
+  #   - cron: '18 5 * * 1'
+
+permissions: write-all
+
+jobs:
+  trivy-sbom:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v3
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build with Buildkit
+      uses: docker/build-push-action@v2
+      with:
+        tags: this/dockerfile
+        load: true
+        push: false
+
+    # vuln-type: "os,library" 
+    #    Run with library only since Debian packages are not supported by GH Dep Graph. 
+    #    We'll run a full Trivy scan to report on those via SARIF GH Code Scan.
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@0.7.1
+      with:
+        image-ref: 'this/dockerfile'
+        format: 'github'
+        output: 'dependency-results.sbom.json'
+        vuln-type: 'library'
+        list-all-pkgs: 'true'
+        github-pat: ${{ secrets.GITHUB_TOKEN }}
