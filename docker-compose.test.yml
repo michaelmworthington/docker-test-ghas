@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+###########################################
+#    Docker Hub Autotest Container
+# https://docs.docker.com/docker-hub/builds/automated-testing/
+#    NOTE: I moved from Docker Hub to GitHub since the multi-architecture builds didn't work on Docker Hub
+###########################################
+  sut:
+    build:
+      context: .
+      # Sample Values to populate in the image - real values will come from the GitHub action with Docker Buildx
+      args:
+        GITHUB_REPOSITORY: michaelmworthington/docker-test-ghas
+        GITHUB_REF_NAME: feature-branch-1
+        GITHUB_RUN_ID: 1658821493
+        GITHUB_RUN_NUMBER: 3
+        GITHUB_SHA: ffac537e6cbbf934b08745a378932722df287a53
+    entrypoint: "bash -c 'id'"
